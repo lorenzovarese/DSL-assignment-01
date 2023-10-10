@@ -14,64 +14,64 @@ import squants.motion.Velocity
 /** The types to be used to specify time in minutes
   */
 import squants.time.Minutes
-
+import squants.time.Time
 /*
  * Implement here, or in other scala files in this package,
  * the semantic model for Exercise 2. If you use other
  * files, please remember to import them.
  */
-case class UniqueName(val value: String):
-  require(value.length > 0)
+case class UniqueName(value: String):
+  require(value.nonEmpty)
   //TODO: mettere constraint su univocità
 
-case class Name(val value: String):
-  require(value.length > 0)
+case class Name(value: String):
+  require(value.nonEmpty)
 
-case class Description(val value: String):
-  require(value.length > 0)
+case class Description(value: String):
+  require(value.nonEmpty)
 
-case class Duration(val value: Minutes):
+case class Duration(min: Time):
+  require(min.value > 0)
+
+case class Repetition(value: Int):
   require(value > 0)
 
-case class Repetition(val value: Int):
+case class WorkoutSet(value: Int, repetition: Repetition):
   require(value > 0)
 
-case class WorkoutSet(val value: Int, val repetition: Repetition):
-  require(value > 0)
+case class Weight(mass: Mass):
+  require(mass.value >= 0)
 
-case class Weight(val value: Kilograms):
-  require(value >= 0)
-
-case class Slope(val value: Int):
+case class Slope(value: Int):
   require(value >= -30 && value <= 30)
 
-case class Speed(val value: KilometersPerHour):
-  require(value >= 0 && value <= 60)
+case class Speed(vel: Velocity):
+  require(vel.value >= 0 && vel.value <= 60)
 
 sealed trait Object:
   val description: Description
 
-case class WorkoutDaily(val description: Description, val workouts: Set[Workout] = Set()) extends Object
+case class WorkoutDaily(description: Description, workouts: Set[Workout] = Set()) extends Object
 
 sealed trait Workout extends Object:
   val description: Description
 
-case class CardioTraining(val description: Description, val duration: Duration) extends Workout
+case class CardioTraining(description: Description, duration: Duration) extends Workout
 
-case class WeightTraining(val description: Description, val set: WorkoutSet) extends Workout
+case class WeightTraining(description: Description, set: WorkoutSet) extends Workout
 
 sealed trait Requirement:
   val name: Name
 
-case class Facility(val fitnessCenter: FitnessCenter)
+sealed trait AbstractFacility:
+  val fitnessCenter: FitnessCenter
+case class Gym(fitnessCenter: FitnessCenter, equipment: Set[Equipment] = Set()) extends AbstractFacility
+case class Facility(fitnessCenter: FitnessCenter) extends AbstractFacility
+case class RequirementFacility(name: Name, facility: Facility) extends Requirement
 
-case class Gym(val fitnessCenter: FitnessCenter, val equipment: Set[Equipment] = Set()) extends Facility
+case class RequirementEquipment(name: Name, weight: Weight) extends Requirement
 
-case class RequirementFacility(val name: Name, val facility: Facility) extends Requirement
-
-case class RequirementEquipment(val name: Name, val weight: Weight) extends Requirement
-
-case class FitnessCenter(val name: UniqueName, val facilities: Set[Facility] = Set()) //Default empty set, but check it
+case class FitnessCenter(name: UniqueName, facilities: Set[Facility] = Set()) //Default empty set, but check it
 
 sealed trait Equipment:
   val name: Name
@@ -79,16 +79,16 @@ sealed trait Equipment:
 
 sealed trait Machine extends Equipment
 
-case class CardioMachine(val name: Name, val gym: Gym, val setting: CardioMachineSetting) extends Machine
+case class CardioMachine(name: Name, gym: Gym, setting: CardioMachineSetting) extends Machine
 
-case class WeightMachine(val name: Name, val gym: Gym, val setting: WeightMachineSetting) extends Machine
+case class WeightMachine(name: Name, gym: Gym, setting: WeightMachineSetting) extends Machine
 
-case class CardioMachineSetting(val slope: Slope, val speed: Speed)
+case class CardioMachineSetting(slope: Slope, speed: Speed)
 
-case class WeightMachineSetting(val min: Weight, val max: Weight):
+case class WeightMachineSetting(min: Mass, max: Mass):
   require(max.value > min.value)
 
-case class Item(val name: Name, val gym: Gym, val weight: Weight) extends Equipment
+case class Item(name: Name, gym: Gym, weight: Weight) extends Equipment
 
 /** Construct - if you want - one or more workout examples examples here.
   */
