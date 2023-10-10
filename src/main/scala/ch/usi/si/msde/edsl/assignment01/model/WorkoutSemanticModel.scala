@@ -92,14 +92,14 @@ case class Item(name: Name, gym: Gym, weight: Weight) extends Equipment
 
 /** Construct - if you want - one or more workout examples examples here.
   */
-@main def exampleWorkout: Unit =
+@main def exampleWorkout(): Unit =
   val exampleWorkout = ???
 
   println(exampleWorkout)
 
 /** Examples to construct weight, speeds, etc. and of the Option data type.
   */
-@main def datatypeExamples: Unit =
+@main def datatypeExamples(): Unit =
   // A mass/weight
   val mass1: Mass = Kilograms(20)
   println(mass1)
