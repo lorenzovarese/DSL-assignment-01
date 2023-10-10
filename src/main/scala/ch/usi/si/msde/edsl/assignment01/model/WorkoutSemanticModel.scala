@@ -63,9 +63,9 @@ case class WeightTraining(val description: Description, val set: WorkoutSet) ext
 sealed trait Requirement:
   val name: Name
 
-case class Facility(val fitnessCenter: FitnessCenter):
+case class Facility(val fitnessCenter: FitnessCenter)
 
-case class Gym(val equipment: Set[Equipment] = Set()) extends Facility:
+case class Gym(val fitnessCenter: FitnessCenter, val equipment: Set[Equipment] = Set()) extends Facility
 
 case class RequirementFacility(val name: Name, val facility: Facility) extends Requirement
 
@@ -77,7 +77,7 @@ sealed trait Equipment:
   val name: Name
   val gym: Gym
 
-sealed trait Machine extends Equipment:
+sealed trait Machine extends Equipment
 
 case class CardioMachine(val name: Name, val gym: Gym, val setting: CardioMachineSetting) extends Machine
 
@@ -86,7 +86,7 @@ case class WeightMachine(val name: Name, val gym: Gym, val setting: WeightMachin
 case class CardioMachineSetting(val slope: Slope, val speed: Speed)
 
 case class WeightMachineSetting(val min: Weight, val max: Weight):
-  require(max > min)
+  require(max.value > min.value)
 
 case class Item(val name: Name, val gym: Gym, val weight: Weight) extends Equipment
 
