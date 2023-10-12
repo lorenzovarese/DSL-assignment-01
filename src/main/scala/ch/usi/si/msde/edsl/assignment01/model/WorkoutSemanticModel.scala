@@ -54,14 +54,15 @@ case class Repetition(value: Int):
 //<editor-fold desc="Workout">
 case class WorkoutDaily(description: Description, workouts: Set[Workout] = Set()) extends DescObject
 sealed trait Workout extends DescObject:
-  val requirements : Option[RequirementSet]
-case class CardioTraining(description: Description, requirements: Option[RequirementSet], duration: Duration) extends Workout
-case class WeightTraining(description: Description, requirements: Option[RequirementSet], set: Workout_Set) extends Workout
+  val requirements : Set[Requirement]
+
+// Set[RequirementSet] = Set() ---> meaning it can be null
+case class CardioTraining(description: Description, duration: Duration, requirements: Set[Requirement] = Set()) extends Workout
+case class WeightTraining(description: Description, set: Workout_Set, requirements: Set[Requirement] = Set()) extends Workout
 
 // </editor-fold>
 
 //<editor-fold desc="Requirement">
-case class RequirementSet(requirements: Set[Requirement] = Set())
 sealed trait Requirement extends NamedObject
 case class RequirementFacility(name: Name, facility: Facility) extends Requirement
 case class RequirementEquipment(name: Name, weight: Option[Weight]) extends Requirement
@@ -99,9 +100,12 @@ case class WeightMachineSetting(min: Mass, max: Mass):
 /** Construct - if you want - one or more workout examples examples here.
   */
 @main def exampleWorkout(): Unit =
-  val cardioTraining = new CardioTraining(new Description("Cardio Traning"), None, new Duration(Minutes(10)))
+
+  val cardioTraining =  CardioTraining(Description("Cardio Traning"), Duration(Minutes(10)), Set(new Requi))
+  // cardio training with not requirement
+  val cardioTraining =  CardioTraining(Description("Cardio Traning"), Duration(Minutes(10)))
   val workouts = Set("apple", "orange", "peach", "banana")
-  val exampleWorkout = new WorkoutDaily(new Description("Monday Workout"))
+  val exampleWorkout =  WorkoutDaily( Description("Monday Workout"))
   println(exampleWorkout)
 
 /** Examples to construct weight, speeds, etc. and of the Option data type.
