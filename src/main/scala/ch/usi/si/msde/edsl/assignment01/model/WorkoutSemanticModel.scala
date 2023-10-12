@@ -20,81 +20,88 @@ import squants.time.Time
  * the semantic model for Exercise 2. If you use other
  * files, please remember to import them.
  */
-case class UniqueName(value: String):
-  require(value.nonEmpty)
-  //TODO: mettere constraint su univocità
+
+
+//<editor-fold desc="Named">
+sealed trait NamedObject:
+  val name: Name
 
 case class Name(value: String):
   require(value.nonEmpty)
-
-case class Description(value: String):
-  require(value.nonEmpty)
-
-case class Duration(min: Time):
-  require(min.value > 0)
-
-case class Repetition(value: Int):
-  require(value > 0)
-
-case class WorkoutSet(value: Int, repetition: Repetition):
-  require(value > 0)
+// </editor-fold>
 
 case class Weight(mass: Mass):
   require(mass.value >= 0)
 
+//<editor-fold desc="Description">
+case class Description(value: String):
+  require(value.nonEmpty)
+sealed trait DescObject:
+  val description: Description
+// </editor-fold>
+
+//<editor-fold desc="Workout_Params">
+case class Duration(min: Time):
+  require(min.value > 0)
+
+case class Workout_Set(value: Int, repetition: Repetition):
+  require(value > 0)
+
+case class Repetition(value: Int):
+  require(value > 0)
+// </editor-fold>
+
+//<editor-fold desc="Workout">
+case class WorkoutDaily(description: Description, workouts: Set[Workout] = Set()) extends DescObject
+sealed trait Workout extends DescObject:
+  val requirements : Option[RequirementSet]
+case class CardioTraining(description: Description, requirements: Option[RequirementSet], duration: Duration) extends Workout
+case class WeightTraining(description: Description, requirements: Option[RequirementSet], set: Workout_Set) extends Workout
+
+// </editor-fold>
+
+//<editor-fold desc="Requirement">
+case class RequirementSet(requirements: Set[Requirement] = Set())
+sealed trait Requirement extends NamedObject
+case class RequirementFacility(name: Name, facility: Facility) extends Requirement
+case class RequirementEquipment(name: Name, weight: Option[Weight]) extends Requirement
+//</editor-fold>
+
+//<editor-fold desc="Facility">
+sealed trait AbstractFacility extends NamedObject:
+  val fitnessCenter: FitnessCenter
+case class Gym(name: Name, fitnessCenter: FitnessCenter, equipment: Set[Equipment] = Set()) extends AbstractFacility
+case class Facility(name : Name, fitnessCenter: FitnessCenter) extends AbstractFacility
+case class FitnessCenter(name: Name, facilities: Set[Facility] = Set()) extends NamedObject
+//</editor-fold>
+
+//<editor-fold desc="Equipment">
+sealed trait Equipment extends NamedObject:
+  val gym: Gym
+case class Item(name: Name, gym: Gym, weight: Weight) extends Equipment
+sealed trait Machine extends Equipment
+case class CardioMachine(name: Name, gym: Gym, setting: CardioMachineSetting) extends Machine
+case class WeightMachine(name: Name, gym: Gym, setting: WeightMachineSetting) extends Machine
+//</editor-fold>
+
+//<editor-fold desc="Settings">
+
 case class Slope(value: Int):
   require(value >= -30 && value <= 30)
-
 case class Speed(vel: Velocity):
   require(vel.value >= 0 && vel.value <= 60)
-
-sealed trait Object:
-  val description: Description
-
-case class WorkoutDaily(description: Description, workouts: Set[Workout] = Set()) extends Object
-
-sealed trait Workout extends Object:
-  val description: Description
-
-case class CardioTraining(description: Description, duration: Duration) extends Workout
-
-case class WeightTraining(description: Description, set: WorkoutSet) extends Workout
-
-sealed trait Requirement:
-  val name: Name
-
-sealed trait AbstractFacility:
-  val fitnessCenter: FitnessCenter
-case class Gym(fitnessCenter: FitnessCenter, equipment: Set[Equipment] = Set()) extends AbstractFacility
-case class Facility(fitnessCenter: FitnessCenter) extends AbstractFacility
-case class RequirementFacility(name: Name, facility: Facility) extends Requirement
-
-case class RequirementEquipment(name: Name, weight: Weight) extends Requirement
-
-case class FitnessCenter(name: UniqueName, facilities: Set[Facility] = Set()) //Default empty set, but check it
-
-sealed trait Equipment:
-  val name: Name
-  val gym: Gym
-
-sealed trait Machine extends Equipment
-
-case class CardioMachine(name: Name, gym: Gym, setting: CardioMachineSetting) extends Machine
-
-case class WeightMachine(name: Name, gym: Gym, setting: WeightMachineSetting) extends Machine
-
 case class CardioMachineSetting(slope: Slope, speed: Speed)
-
 case class WeightMachineSetting(min: Mass, max: Mass):
   require(max.value > min.value)
 
-case class Item(name: Name, gym: Gym, weight: Weight) extends Equipment
+
 
 /** Construct - if you want - one or more workout examples examples here.
   */
 @main def exampleWorkout(): Unit =
-  val exampleWorkout = ???
-
+  val cardioTraining = new CardioTraining(new Description("Cardio Traning"), None, new Duration(Minutes(10)))
+  val workouts = Set("apple", "orange", "peach", "banana")
+  val exampleWorkout = new WorkoutDaily(new Description("Monday Workout"))
   println(exampleWorkout)
 
 /** Examples to construct weight, speeds, etc. and of the Option data type.
