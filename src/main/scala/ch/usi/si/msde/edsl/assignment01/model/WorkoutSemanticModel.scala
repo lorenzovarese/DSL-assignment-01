@@ -69,7 +69,9 @@ sealed trait Requirement extends NamedObject
 case class RequirementFacility(name: Name, facility: ObjectFacility) extends Requirement
 
 //Todo: check if weight is needed
+// equipments can be empty if user want to
 case class RequirementWeightTraining(name: Name, equipments: Set[WeightEquipment] = Set(), weight: Weight) extends Requirement
+
 case class RequirementCardio(name: Name, cardioMachines: CardioMachine) extends Requirement
 //</editor-fold>
 
@@ -103,10 +105,10 @@ case class WeightMachineSetting(min: Mass, max: Mass):
 
 /** Construct - if you want - one or more workout examples examples here.
   */
-// Cardio Traning Workout
+// Cardio Training Workout
 
 val cardioMachineSetting = CardioMachineSetting(Slope(30), Speed(KilometersPerHour(30)))
-val cardioMachine1 = CardioMachine(Name("Cardio Machine"), cardioMachineSetting);
+val cardioMachine1 = CardioMachine(Name("Cardio Machine"), cardioMachineSetting)
 val weightMachineSetting = WeightMachineSetting(Kilograms(10), Kilograms(100))
 val weightMachine1 = WeightMachine(Name("Weight machine"), weightMachineSetting)
 val item = Item(Name("Item"), Weight(Kilograms(30)))
@@ -171,7 +173,7 @@ val requirementGym = RequirementFacility(Name("My Gym"), gym)
   val shoulderPressMachine = WeightMachine(Name("Shoulder press machine"), genericMachineSettings)
   val requirementShoulderPressMachine = RequirementWeightTraining(Name("Req Shoulder press"), Set(chestPressMachine), Weight(Kilograms(20)))
   val dumbbell = Item(Name("Dumbbell"), Weight(Kilograms(30)))
-  val requirementDumbbell = RequirementWeightTraining(Name("Dumbell"), Set(dumbbell), Weight(Kilograms(20)))
+  val requirementDumbbell = RequirementWeightTraining(Name("Dumbbell"), Set(dumbbell), Weight(Kilograms(20)))
   // workouts
   val chestWorkout = WorkoutWeightTraining(Description("Chest Workout"), Workout_Set(3, Repetition(12)), Set(requirementFacility), Set(requirementChestPressMachine))
   val bicepsWorkout = WorkoutWeightTraining(Description("Biceps workout"), Workout_Set(4, Repetition(15)), Set(requirementFacility) ,Set(requirementDumbbell))
