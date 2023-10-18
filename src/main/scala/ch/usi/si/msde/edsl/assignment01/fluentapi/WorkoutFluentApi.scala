@@ -19,9 +19,16 @@ trait WorkoutFluentApi:
   def cardioMachine(name: Name, cardioMachineSetting: CardioMachineSetting) : CardioMachine = ???
 
   //Weight & weight machine
+
+  class MinWeight(weight: Mass)
+  class MaxWeight(weight: Mass)
+
+  def `with min weight`(weight: Mass) : MinWeight = ???
+  def `with max weight`(weight: Mass) : MaxWeight = ???
   def `with weight`(weight: Mass) : Weight = ???
-  def `with weight machine settings`(min : Weight, max : Weight) : WeightMachineSetting = ???
-  def weightMachine(name: Name, weightMachineSetting: WeightMachineSetting) : WeightMachine = ???
+  def `contains weights`(weight: Mass*) : Set[Weight] = ???
+  def `with weight machine settings`(`min`: MinWeight, max : MaxWeight) : WeightMachineSetting = ???
+  def weightMachine(name: Name, weightMachineSetting: WeightMachineSetting, weights: Set[Weight] = Set()) : WeightMachine = ???
   def item(name: Name, weight: Weight) : Item = ???
 
   // facility & fitness center
@@ -72,7 +79,7 @@ object WorkoutFluentApiExample1 extends WorkoutFluentApi:
     `with cardio settings`(`with angle`(30), `with speed`(KilometersPerHour(30))))
 
   weightMachine(named("Weight Machine"),
-    `with weight machine settings`(`with weight`(Kilograms(10)), `with weight`(Kilograms(30))))
+    `with weight machine settings`(`with min weight`(Kilograms(10)), `with max weight`(Kilograms(30))), `contains weights`(Kilograms(10),Kilograms(20), Kilograms(30)))
 
   item(named("Dumbbell"), `with weight`(Kilograms(30)))
 

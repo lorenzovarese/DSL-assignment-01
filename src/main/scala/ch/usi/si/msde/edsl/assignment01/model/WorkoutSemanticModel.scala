@@ -44,7 +44,7 @@ sealed trait DescObject:
 
 //<editor-fold desc="Workout_Params">
 case class Duration(min: Time):
-  require(min.value > 0)
+  require(min.toMinutes > 0)
 
 case class Workout_Set(value: Int, repetition: Repetition):
   require(value > 0)
@@ -88,7 +88,7 @@ sealed trait Equipment extends NamedObject
 case class Item(name: Name, weight: Weight) extends Equipment, WeightEquipment
 sealed trait Machine extends Equipment
 case class CardioMachine(name: Name, setting: CardioMachineSetting) extends Machine
-case class WeightMachine(name: Name, setting: WeightMachineSetting) extends Machine, WeightEquipment
+case class WeightMachine(name: Name, setting: WeightMachineSetting, weights: Set[Weight] = Set()) extends Machine, WeightEquipment
 //</editor-fold>
 
 //<editor-fold desc="Settings">
@@ -170,7 +170,7 @@ val requirementGym = RequirementFacility(Name("My Gym"), gym)
   val genericMachineSettings = WeightMachineSetting(Kilograms(10), Kilograms(60))
   val chestPressMachine =  WeightMachine(Name("Chest Press"), genericMachineSettings)
   val requirementChestPressMachine = RequirementWeightTraining(Name("Req ChestPress"), Set(chestPressMachine), Weight(Kilograms(20)))
-  val shoulderPressMachine = WeightMachine(Name("Shoulder press machine"), genericMachineSettings)
+  val shoulderPressMachine = WeightMachine(Name("Shoulder press machine"), genericMachineSettings, Set(Weight(Kilograms(10)), Weight(Kilograms(20)), Weight(Kilograms(30)), Weight(Kilograms(40)), Weight(Kilograms(50)), Weight(Kilograms(60))))
   val requirementShoulderPressMachine = RequirementWeightTraining(Name("Req Shoulder press"), Set(chestPressMachine), Weight(Kilograms(20)))
   val dumbbell = Item(Name("Dumbbell"), Weight(Kilograms(30)))
   val requirementDumbbell = RequirementWeightTraining(Name("Dumbbell"), Set(dumbbell), Weight(Kilograms(20)))
