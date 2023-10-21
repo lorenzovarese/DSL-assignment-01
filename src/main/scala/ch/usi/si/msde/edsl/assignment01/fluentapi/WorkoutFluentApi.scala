@@ -13,26 +13,26 @@ trait WorkoutFluentApi:
   def `described by`(desc: String) : Description = ???
 
   //Cardio machines
-  def `with angle`(slope: Integer) : Slope = ???
-  def `with speed`(speed: Velocity) : Speed = ???
-  def `with cardio settings`(slope: Slope, speed: Speed) : CardioMachineSetting = ???
+  def `set angle`(slope: Integer) : Slope = ???
+  def `set speed`(speed: Velocity) : Speed = ???
+  def `configure settings`(slope: Slope, speed: Speed) : CardioMachineSetting = ???
   def `create cardio machine`(name: Name, cardioMachineSetting: CardioMachineSetting) : CardioMachine = ???
 
   //Weight & weight machine
   class MinWeight(weight: Mass)
   class MaxWeight(weight: Mass)
 
-  def `with min weight`(weight: Mass) : MinWeight = ???
-  def `with max weight`(weight: Mass) : MaxWeight = ???
+  def `set min weight`(weight: Mass) : MinWeight = ???
+  def `set max weight`(weight: Mass) : MaxWeight = ???
   def `with weight`(weight: Mass) : Weight = ???
   def `contains weights`(weight: Mass*) : Set[Weight] = ???
-  def `with weight machine settings`(`min`: MinWeight, max : MaxWeight) : WeightMachineSetting = ???
+  def `configure settings`(`min`: MinWeight, max : MaxWeight) : WeightMachineSetting = ???
   def `create weight machine`(name: Name, weightMachineSetting: WeightMachineSetting, weights: Set[Weight] = Set()) : WeightMachine = ???
   def `create item`(name: Name, weight: Weight) : Item = ???
 
   // facility & fitness center
   def `create fitness center`(name: Name, facilities: Set[ObjectFacility] = Set()) : FitnessCenter = ???
-  def `composed of`(facilities: String*) : Set[ObjectFacility] = ???
+  def `contains`(facilities: String*) : Set[ObjectFacility] = ???
   def `create facility`(name: Name) : Facility = ???
   def `create gym`(name: Name, equipment: Set[Equipment] = Set()) : Gym = ???
   def `owns`(equipments: String*) : Set[Equipment] = ???
@@ -59,7 +59,7 @@ trait WorkoutFluentApi:
   def `weight equipments`(equipments: String*) : Set[WeightEquipment] = ???
   def `requirement weight training`(name: Name, set: Set[WeightEquipment] = Set(), weight: Weight) : RequirementWeightTraining = ???
   class WorkoutWeightTrainingBuilder(description: Description, workout_Set: Workout_Set) extends WorkoutBuilder(description):
-    def `add weight equipment`(requirementWeightTraining: RequirementWeightTraining): WorkoutWeightTrainingBuilder = ???
+    def `add`(requirementWeightTraining: RequirementWeightTraining): WorkoutWeightTrainingBuilder = ???
   def `that lasts`(time : Time) : Duration = ???
   class WorkoutCardioTrainingBuilder(description: Description, duration: Duration) extends WorkoutBuilder(description):
     def `add cardio machine`(machine: CardioMachine): WorkoutCardioTrainingBuilder = ???
@@ -74,7 +74,7 @@ end WorkoutFluentApi
  */
 object WorkoutExercise1Example1 extends WorkoutFluentApi:
 
-  `create fitness center`(named("USI Fitness Center"), `composed of`("Swimming Pool", "Gym"))
+  `create fitness center`(named("USI Fitness Center"), `contains`("Swimming Pool", "Gym"))
 
   `workout daily schedule`(`described by`("Cardio Training Day 1"),
     `create cardio training`(`described by`("Swimming"), `that lasts`(Minutes(30)))
@@ -92,15 +92,15 @@ object WorkoutExercise1Example2 extends WorkoutFluentApi:
   `workout daily schedule`(`described by`("Upper Body Weight Training"),
 
     `create weight workout`(`described by`("Chest Workout"), `with`(3, `sets multiplied by`(12)))
-      .`add weight equipment`(`requirement weight training`(
+      .`add`(`requirement weight training`(
         named("Chest Requirement"),
         `weight equipments`("Chest Press Machine"),
           matches(Kilograms(50))
-        )
+      )
       ).build(),
 
     `create weight workout`(`described by`("Biceps Workout"), `with`(4, `sets multiplied by`(15)))
-      .`add weight equipment`(`requirement weight training`(
+      .`add`(`requirement weight training`(
           named("Biceps Requirement"),
           `weight equipments`("Dumbbell"),
           matches(Kilograms(20))
@@ -108,7 +108,7 @@ object WorkoutExercise1Example2 extends WorkoutFluentApi:
       ).build(),
 
     `create weight workout`(`described by`("Shoulder Workout"), `with`(4, `sets multiplied by`(10)))
-      .`add weight equipment`(`requirement weight training`(
+      .`add`(`requirement weight training`(
           named("Shoulder Requirement"),
           `weight equipments`("Shoulder Press Machine"),
           matches(Kilograms(30))
@@ -116,7 +116,7 @@ object WorkoutExercise1Example2 extends WorkoutFluentApi:
       ).build()
   )
 
-  `create fitness center`(named("Only Gym"), `composed of`("USI Gym"))
+  `create fitness center`(named("Only Gym"), `contains`("USI Gym"))
 
 end WorkoutExercise1Example2
 
@@ -129,35 +129,33 @@ object WorkoutFluentApiGenericExample1 extends WorkoutFluentApi:
 
   //cardio Machine
   `create cardio machine`(named("Tapis Roulant"),
-    `with cardio settings`(`with angle`(30), `with speed`(KilometersPerHour(30))))
+    `configure settings`(`set angle`(30), `set speed`(KilometersPerHour(30))))
 
   `create weight machine`(named("Lat Machine"),
-    `with weight machine settings`(`with min weight`(Kilograms(10)), `with max weight`(Kilograms(30))), `contains weights`(Kilograms(10),Kilograms(20), Kilograms(30)))
+    `configure settings`(`set min weight`(Kilograms(10)), `set max weight`(Kilograms(30))), `contains weights`(Kilograms(10),Kilograms(20), Kilograms(30)))
 
   `create item`(named("Dumbbell"), `with weight`(Kilograms(15)))
 
   `create facility`(named("Swimming pool"))
 
-  `create gym`(named("Gym A"), `owns`("Cardio Machine", "Weight Machine", "Dumbbell"))
+  `create gym`(named("Gym A"), `owns`("Tapis Roulant", "Lat Machine", "Dumbbell"))
 
-  `create fitness center`(named("FitCenter"), `composed of`("Gym A", "Swimming Pool"))
+  `create fitness center`(named("FitCenter"), `contains`("Gym A", "Swimming Pool"))
 
-  `workout daily schedule`(`described by`("Full Body Workout"),
-    `create weight workout`(`described by`("Weight workout"), `with`(3, `sets multiplied by`(10)))
-      .`add weight equipment`(
+  `workout daily schedule`(`described by`("Shoulder&Back Workout"),
+    `create weight workout`(`described by`("Dumbbell Overhead Press"), `with`(3, `sets multiplied by`(10)))
+      .`add`(
         `requirement weight training`(
           named("Requirement weights"),
           `weight equipments`("Dumbbell"),
           matches(Kilograms(30))
         ))
-      .`add`(`requirement facility`(named("Requirement Gym"), `located at`("Gym A")))
       .build(),
-    `create weight workout`(`described by`("Weight workout 2"), `with`(1, `set multiplied by`(15)))
-      .`add weight equipment`(
-        `requirement weight training`(named("Require weight machine"),
-          `weight equipments`("Weight Machine"), matches(Kilograms(20)))
+    `create weight workout`(`described by`("Wide-Grip Lat Pull-Down"), `with`(1, `set multiplied by`(25)))
+      .`add`(
+        `requirement weight training`(named("Require Lat Machine"),
+          `weight equipments`("Lat Machine"), matches(Kilograms(35)))
       )
-      .`add`(`requirement facility`(named("Requirement Gym"), `located at`("Gym A")))
       .build()
   )
 
@@ -173,32 +171,32 @@ object WorkoutFluentApiGenericExample2 extends WorkoutFluentApi:
 
   // Cardio and Weight Machines
   `create cardio machine`(named("Cycling Machine"),
-    `with cardio settings`(`with angle`(0), `with speed`(KilometersPerHour(25))))
+    `configure settings`(`set angle`(0), `set speed`(KilometersPerHour(25))))
 
   `create weight machine`(named("Leg Press Machine"),
-    `with weight machine settings`(`with min weight`(Kilograms(20)), `with max weight`(Kilograms(100))), `contains weights`(Kilograms(20), Kilograms(40), Kilograms(60)))
+    `configure settings`(`set min weight`(Kilograms(20)), `set max weight`(Kilograms(100))), `contains weights`(Kilograms(20), Kilograms(40), Kilograms(60)))
 
   `create weight machine`(named("Squat Rack"),
-    `with weight machine settings`(`with min weight`(Kilograms(40)), `with max weight`(Kilograms(150))), `contains weights`(Kilograms(40), Kilograms(80), Kilograms(120)))
+    `configure settings`(`set min weight`(Kilograms(40)), `set max weight`(Kilograms(150))), `contains weights`(Kilograms(40), Kilograms(80), Kilograms(120)))
 
   // Facilities
   `create facility`(named("Cycling Studio"))
   `create gym`(named("Gym JL"), `owns`("Cycling Machine", "Leg Press Machine", "Squat Rack"))
 
   // Fitness Center
-  `create fitness center`(named("Fitness Center with Cycling Studio"), `composed of`("Gym JL", "Cycling Studio"))
+  `create fitness center`(named("Fitness Center with Cycling Studio"), `contains`("Gym JL", "Cycling Studio"))
 
   // Workout Daily Schedule
   `workout daily schedule`(`described by`("Lower Body and Cardio Training"),
     `create weight workout`(`described by`("Leg Press Workout"), `with`(4, `sets multiplied by`(12)))
-      .`add weight equipment`(`requirement weight training`(
+      .`add`(`requirement weight training`(
         named("Leg Press Requirement"),
         `weight equipments`("Leg Press Machine"),
         matches(Kilograms(60))
       )).build(),
 
     `create weight workout`(`described by`("Squats"), `with`(3, `sets multiplied by`(10)))
-      .`add weight equipment`(`requirement weight training`(
+      .`add`(`requirement weight training`(
         named("Squat Requirement"),
         `weight equipments`("Squat Rack"),
         matches(Kilograms(80))
