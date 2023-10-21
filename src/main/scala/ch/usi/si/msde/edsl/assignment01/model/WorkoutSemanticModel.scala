@@ -214,11 +214,51 @@ case class RequirementCardio(name: Name, cardioMachines: CardioMachine) extends 
 
 //<editor-fold desc="Equipment">
 
-sealed trait WeightEquipment
+/**
+ * Sealed trait representing general equipment. All types of equipment extend this trait.
+ *
+ * Extends NamedObject to ensure each piece of equipment has a name.
+ */
 sealed trait Equipment extends NamedObject
+
+/**
+ * Sealed trait representing weight equipment. Serves as a type marker for equipment dealing with weights.
+ */
+sealed trait WeightEquipment
+
+/**
+ * Case class representing a single item, like a dumbbell or a barbell.
+ *
+ * @constructor Create a new Item instance.
+ * @param name The name of the item.
+ * @param weight The weight of the item.
+ */
 case class Item(name: Name, weight: Weight) extends Equipment, WeightEquipment
+
+/**
+ * Sealed trait representing a machine, serving as a type marker for different types of machines.
+ *
+ * Extends Equipment to indicate that machines are a subtype of equipment.
+ */
 sealed trait Machine extends Equipment
+
+/**
+ * Case class representing a cardio machine like a treadmill or an elliptical.
+ *
+ * @constructor Create a new CardioMachine instance.
+ * @param name The name of the machine.
+ * @param setting The settings of the cardio machine, including speed and slope.
+ */
 case class CardioMachine(name: Name, setting: CardioMachineSetting) extends Machine
+
+/**
+ * Case class representing a weight machine like a leg press or a bench press machine.
+ *
+ * @constructor Create a new WeightMachine instance.
+ * @param name The name of the machine.
+ * @param setting The settings of the weight machine, including minimum and maximum weight.
+ * @param weights Optional set of weight settings. Defaults to an empty set.
+ */
 case class WeightMachine(name: Name, setting: WeightMachineSetting, weights: Set[Weight] = Set()) extends Machine, WeightEquipment
 
 //</editor-fold>
