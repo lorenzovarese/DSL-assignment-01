@@ -5,21 +5,20 @@ import squants.motion.{KilometersPerHour, Velocity}
 import squants.time.{Minutes, Time}
 
 /**
-  * Exercise 3
-  * Sketch the fluent API methods in this trait.
+  * Exercise 3 - Fluent API
+  *
   */
 trait WorkoutFluentApi:
   def named(name: String): Name = ???
-  def described(desc: String) : Description = ???
+  def `described by`(desc: String) : Description = ???
 
   //Cardio machines
   def `with angle`(slope: Integer) : Slope = ???
   def `with speed`(speed: Velocity) : Speed = ???
   def `with cardio settings`(slope: Slope, speed: Speed) : CardioMachineSetting = ???
-  def cardioMachine(name: Name, cardioMachineSetting: CardioMachineSetting) : CardioMachine = ???
+  def `create cardio machine`(name: Name, cardioMachineSetting: CardioMachineSetting) : CardioMachine = ???
 
   //Weight & weight machine
-
   class MinWeight(weight: Mass)
   class MaxWeight(weight: Mass)
 
@@ -28,92 +27,186 @@ trait WorkoutFluentApi:
   def `with weight`(weight: Mass) : Weight = ???
   def `contains weights`(weight: Mass*) : Set[Weight] = ???
   def `with weight machine settings`(`min`: MinWeight, max : MaxWeight) : WeightMachineSetting = ???
-  def weightMachine(name: Name, weightMachineSetting: WeightMachineSetting, weights: Set[Weight] = Set()) : WeightMachine = ???
-  def item(name: Name, weight: Weight) : Item = ???
+  def `create weight machine`(name: Name, weightMachineSetting: WeightMachineSetting, weights: Set[Weight] = Set()) : WeightMachine = ???
+  def `create item`(name: Name, weight: Weight) : Item = ???
 
   // facility & fitness center
-  def fitnessCenter(name: Name, facilities: Set[ObjectFacility] = Set()) : FitnessCenter = ???
+  def `create fitness center`(name: Name, facilities: Set[ObjectFacility] = Set()) : FitnessCenter = ???
   def `composed of`(facilities: String*) : Set[ObjectFacility] = ???
-  def facility(name: Name) : Facility = ???
-  def gym(name: Name, equipment: Set[Equipment] = Set()) : Gym = ???
+  def `create facility`(name: Name) : Facility = ???
+  def `create gym`(name: Name, equipment: Set[Equipment] = Set()) : Gym = ???
   def `owns`(equipments: String*) : Set[Equipment] = ???
 
   // Workout Daily schedule
   def `workout daily schedule`(description: Description, workouts:Workout*) : WorkoutDaily = ???
 
   // requirement facility
-  def `at place`(string: String) : ObjectFacility = ???
+  def `located at`(string: String) : ObjectFacility = ???
   def `requirement facility`(name: Name, facility: ObjectFacility) : RequirementFacility = ???
   abstract class DescObject(description: Description)
-
   class WorkoutBuilder(description: Description) extends DescObject(description):
-    def `add req facility`(requirementFacility: Requirement): WorkoutBuilder = ???
+    def `add`(requirementFacility: Requirement): WorkoutBuilder = ???
     def build() : Workout = ???
-  // Workout weight training
-  def `number of`(sets: Integer, repetition: Repetition) : Workout_Set = ???
-  def `multiply by`(repetition: Integer) : Repetition = ???
-  def `new workout weight`(description: Description, workout_Set: Workout_Set) : WorkoutWeightTrainingBuilder = ???
-  // Requirement weight training
 
+  // Workout weight training
+  def `with`(sets: Integer, repetition: Repetition) : Workout_Set = ???
+  def `set multiplied by`(repetition: Integer) : Repetition = ???
+  def `sets multiplied by`(repetition: Integer) : Repetition = ???
+  def `create weight workout`(description: Description, workout_Set: Workout_Set) : WorkoutWeightTrainingBuilder = ???
+
+  // Requirement weight training
   def matches(mass: Mass) : Weight = ???
   def `weight equipments`(equipments: String*) : Set[WeightEquipment] = ???
   def `requirement weight training`(name: Name, set: Set[WeightEquipment] = Set(), weight: Weight) : RequirementWeightTraining = ???
   class WorkoutWeightTrainingBuilder(description: Description, workout_Set: Workout_Set) extends WorkoutBuilder(description):
     def `add weight equipment`(requirementWeightTraining: RequirementWeightTraining): WorkoutWeightTrainingBuilder = ???
-
-  def lasts(time : Time) : Duration = ???
+  def `that lasts`(time : Time) : Duration = ???
   class WorkoutCardioTrainingBuilder(description: Description, duration: Duration) extends WorkoutBuilder(description):
     def `add cardio machine`(machine: CardioMachine): WorkoutCardioTrainingBuilder = ???
-    def `create workout cardio training` : WorkoutCardioTraining = ???
-
+  def `create cardio training`(description: Description, duration: Duration): WorkoutCardioTrainingBuilder = ???
 
 end WorkoutFluentApi
 
 /**
-  * Use the fluent API to construct a workout schedule example.
-  */
-object WorkoutFluentApiExample1 extends WorkoutFluentApi:
+ * This object WorkoutExercise1Example1 serves as the implementation for Example 1,
+ * as described in the first section of the Assignment Instructions.
+ *
+ */
+object WorkoutExercise1Example1 extends WorkoutFluentApi:
+
+  `create fitness center`(named("USI Fitness Center"), `composed of`("Swimming Pool", "Gym"))
+
+  `workout daily schedule`(`described by`("Cardio Training Day 1"),
+    `create cardio training`(`described by`("Swimming"), `that lasts`(Minutes(30)))
+      .`add`(`requirement facility`(named("Swimming Pool Requirement"), `located at`("Swimming Pool"))).build(),
+    `create cardio training`(`described by`("Outdoor Running"), `that lasts`(Minutes(30))).build())
+
+end WorkoutExercise1Example1
+
+/**
+ * This object WorkoutExercise1Example2 serves as the implementation for Example 2,
+ * as described in the first section of the Assignment Instructions.
+ *
+ */
+object WorkoutExercise1Example2 extends WorkoutFluentApi:
+  `workout daily schedule`(`described by`("Upper Body Weight Training"),
+
+    `create weight workout`(`described by`("Chest Workout"), `with`(3, `sets multiplied by`(12)))
+      .`add weight equipment`(`requirement weight training`(
+        named("Chest Requirement"),
+        `weight equipments`("Chest Press Machine"),
+          matches(Kilograms(50))
+        )
+      ).build(),
+
+    `create weight workout`(`described by`("Biceps Workout"), `with`(4, `sets multiplied by`(15)))
+      .`add weight equipment`(`requirement weight training`(
+          named("Biceps Requirement"),
+          `weight equipments`("Dumbbell"),
+          matches(Kilograms(20))
+        )
+      ).build(),
+
+    `create weight workout`(`described by`("Shoulder Workout"), `with`(4, `sets multiplied by`(10)))
+      .`add weight equipment`(`requirement weight training`(
+          named("Shoulder Requirement"),
+          `weight equipments`("Shoulder Press Machine"),
+          matches(Kilograms(30))
+        )
+      ).build()
+  )
+
+  `create fitness center`(named("Only Gym"), `composed of`("USI Gym"))
+
+end WorkoutExercise1Example2
+
+/**
+ * This object WorkoutFluentApiGenericExample1 defines a fitness center with cardio and weight machines,
+ * a dumbbell, and a swimming pool. It also specifies two daily weight workouts.
+ *
+ */
+object WorkoutFluentApiGenericExample1 extends WorkoutFluentApi:
 
   //cardio Machine
-  cardioMachine(named("Cardio Machine"),
+  `create cardio machine`(named("Tapis Roulant"),
     `with cardio settings`(`with angle`(30), `with speed`(KilometersPerHour(30))))
 
-  weightMachine(named("Weight Machine"),
+  `create weight machine`(named("Lat Machine"),
     `with weight machine settings`(`with min weight`(Kilograms(10)), `with max weight`(Kilograms(30))), `contains weights`(Kilograms(10),Kilograms(20), Kilograms(30)))
 
-  item(named("Dumbbell"), `with weight`(Kilograms(30)))
+  `create item`(named("Dumbbell"), `with weight`(Kilograms(15)))
 
-  facility(named("Swimming pool"))
-  gym(named("Gym A"), `owns`("Cardio Machine", "Weight Machine", "Dumbbell"))
+  `create facility`(named("Swimming pool"))
 
-  fitnessCenter(named("Fitness Center"), `composed of`("Gym A", "Swimming Pool"))
+  `create gym`(named("Gym A"), `owns`("Cardio Machine", "Weight Machine", "Dumbbell"))
 
-  `workout daily schedule`(described("Cardio Training"),
-    `new workout weight`(described("Weight workout"), `number of`(3, `multiply by`(10)))
+  `create fitness center`(named("FitCenter"), `composed of`("Gym A", "Swimming Pool"))
+
+  `workout daily schedule`(`described by`("Full Body Workout"),
+    `create weight workout`(`described by`("Weight workout"), `with`(3, `sets multiplied by`(10)))
       .`add weight equipment`(
         `requirement weight training`(
           named("Requirement weights"),
           `weight equipments`("Dumbbell"),
           matches(Kilograms(30))
         ))
-      .`add req facility`(`requirement facility`(named("Requirement Gym"), `at place`("Gym A")))
+      .`add`(`requirement facility`(named("Requirement Gym"), `located at`("Gym A")))
       .build(),
-    `new workout weight`(described("Weight workout 2"), `number of`(3, `multiply by`(15)))
+    `create weight workout`(`described by`("Weight workout 2"), `with`(1, `set multiplied by`(15)))
       .`add weight equipment`(
         `requirement weight training`(named("Require weight machine"),
           `weight equipments`("Weight Machine"), matches(Kilograms(20)))
       )
-      .`add req facility`(`requirement facility`(named("Requirement Gym"), `at place`("Gym A")))
+      .`add`(`requirement facility`(named("Requirement Gym"), `located at`("Gym A")))
       .build()
   )
 
 
-end WorkoutFluentApiExample1
+end WorkoutFluentApiGenericExample1
 
 /**
-  * Use the fluent API to construct another workout schedule example.
-  */
-object WorkoutFluentApiExample2 extends WorkoutFluentApi:
+ * This object WorkoutFluentApiGenericExample2 sets up a fitness center with cardio and weight machines in a gym
+ * and a separate cycling studio. It also outlines a daily workout schedule focused on lower body and cardio training.
+ *
+ */
+object WorkoutFluentApiGenericExample2 extends WorkoutFluentApi:
 
+  // Cardio and Weight Machines
+  `create cardio machine`(named("Cycling Machine"),
+    `with cardio settings`(`with angle`(0), `with speed`(KilometersPerHour(25))))
 
-end WorkoutFluentApiExample2
+  `create weight machine`(named("Leg Press Machine"),
+    `with weight machine settings`(`with min weight`(Kilograms(20)), `with max weight`(Kilograms(100))), `contains weights`(Kilograms(20), Kilograms(40), Kilograms(60)))
+
+  `create weight machine`(named("Squat Rack"),
+    `with weight machine settings`(`with min weight`(Kilograms(40)), `with max weight`(Kilograms(150))), `contains weights`(Kilograms(40), Kilograms(80), Kilograms(120)))
+
+  // Facilities
+  `create facility`(named("Cycling Studio"))
+  `create gym`(named("Gym JL"), `owns`("Cycling Machine", "Leg Press Machine", "Squat Rack"))
+
+  // Fitness Center
+  `create fitness center`(named("Fitness Center with Cycling Studio"), `composed of`("Gym JL", "Cycling Studio"))
+
+  // Workout Daily Schedule
+  `workout daily schedule`(`described by`("Lower Body and Cardio Training"),
+    `create weight workout`(`described by`("Leg Press Workout"), `with`(4, `sets multiplied by`(12)))
+      .`add weight equipment`(`requirement weight training`(
+        named("Leg Press Requirement"),
+        `weight equipments`("Leg Press Machine"),
+        matches(Kilograms(60))
+      )).build(),
+
+    `create weight workout`(`described by`("Squats"), `with`(3, `sets multiplied by`(10)))
+      .`add weight equipment`(`requirement weight training`(
+        named("Squat Requirement"),
+        `weight equipments`("Squat Rack"),
+        matches(Kilograms(80))
+      )).build(),
+
+    `create cardio training`(`described by`("Cycling"), `that lasts`(Minutes(45)))
+      .`add`(`requirement facility`(named("Cycling Studio Requirement"), `located at`("Cycling Studio")))
+      .build()
+  )
+
+end WorkoutFluentApiGenericExample2
